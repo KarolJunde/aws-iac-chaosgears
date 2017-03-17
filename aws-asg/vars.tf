@@ -15,12 +15,12 @@ variable "region" {
 
 variable "access_key" {
   description = "My AWS_ACCESS_KEY_ID"
-  default = "AKIAJMNQUH3KXUAMIBLA"
+  default = ""
 }
 
 variable "secret_key" {
   description = "My AWS_SECRET_ACCESS_KEY"
-  default = "y3ZJig9EFQy8XIA7DrtrC+SHaibqOIKd9z70fozD"
+  default = ""
 }
 
 variable "instance_type" {
