@@ -28,7 +28,7 @@ variable "key_name" {
 }
 
 #--------------------------------------------------------------------------------------
-resource "aws_instance" "ec2" {
+resource "aws_instance" "amiweb" {
     instance_type = "${var.instance_type}"
 # basing on variables choose the proper ami
     ami = "${lookup(var.ami_image_id, var.region)}"
@@ -37,19 +37,19 @@ resource "aws_instance" "ec2" {
 }
 
 #--------------------------------------------------------------------------------------
-# reference to aws_instance.ec2 -> variable ami
+# reference to aws_instance.amiweb -> variable ami
 output "id" {
-    value = "${aws_instance.ec2.ami}"
+    value = "${aws_instance.amiweb.ami}"
 }
 
 #--------------------------------------------------------------------------------------
-# reference to aws_instance.ec2 -> variable instance_type
+# reference to aws_instance.amiweb -> variable instance_type
 output "instance_type" {
-    value = "${aws_instance.ec2.instance_type}"
+    value = "${aws_instance.amiweb.instance_type}"
 }
 
 #--------------------------------------------------------------------------------------
-# reference to aws_instance.ec2 -> variable key_name
+# reference to aws_instance.amiweb -> variable key_name
 output "key" {
-    value = "${aws_instance.ec2.key_name}"
+    value = "${aws_instance.amiweb.key_name}"
 }

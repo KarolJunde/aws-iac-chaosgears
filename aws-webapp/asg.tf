@@ -4,8 +4,9 @@
 module "ami_image" {
 # modules/ami directory with main.tf
   source        = "modules/ami"
-# instance_type variable replaced with web_instance_type from "development.tfvars"
+# instance_type variable replaced with web_instance_type from "webapp_dev.tfvars"
   instance_type = "${var.web_instance_type}"
+# region variable replaced with region from "webapp_dev.tfvars"
   region        = "${var.region}"
 }
 
