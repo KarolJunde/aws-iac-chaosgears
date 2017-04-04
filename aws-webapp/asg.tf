@@ -11,7 +11,7 @@ module "ami_image" {
 }
 
 # GET THE LIST OF AVAILABILITY ZONES IN THE CURRENT REGION
-# Every AWS accout has slightly different availability zones in each region.
+# Every AWS account has slightly different availability zones in each region.
 # ---------------------------------------------------------------------------------------------------------------------
 
 data "aws_availability_zones" "all" {}

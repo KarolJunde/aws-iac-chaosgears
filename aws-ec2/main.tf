@@ -16,6 +16,7 @@ resource "aws_instance" "EC2example" {
   # Ubuntu Server 14.04 LTS (HVM), SSD Volume Type in eu-central-1
   ami = "ami-af0fc0c0"
   instance_type = "${var.instance_type}"
+  # “${TYPE.NAME.ATTRIBUTE}”
   vpc_security_group_ids = ["${aws_security_group.instance.id}"]
   key_name = "MyEC2KeyPair"
   user_data = <<-EOF
@@ -30,6 +31,10 @@ resource "aws_instance" "EC2example" {
 
   tags {
     Name = "myEC2example"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 # ---------------------------------------------------------------------------------------------------------------------
