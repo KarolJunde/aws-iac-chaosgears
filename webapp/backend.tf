@@ -1,3 +1,6 @@
+#--------------------------------------------------------------
+# S3 WITH DynamoDB LOCKING CONFIGURATION
+#--------------------------------------------------------------
 terraform {
     backend "s3" {
         bucket 		= "s3-terraform-project"
