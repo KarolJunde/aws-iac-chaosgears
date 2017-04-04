@@ -3,11 +3,14 @@
 # VPC MODULE 
 #--------------------------------------------------------------
 
-variable "name" { default = "vpc" }
-variable "region" {default = "eu-central-1"}
+variable "name" { }
+variable "env"  { }
+variable "region" { }
 variable "cidr" { }
 
 resource "aws_vpc" "vpc" {
+  
+  #name   			   = "VPC-${var.name}-${var.env}"
   #assign CIDR block i.e 10.0.0.0/16
   cidr_block           = "${var.cidr}"
   # default true
@@ -15,7 +18,10 @@ resource "aws_vpc" "vpc" {
   # default false
   enable_dns_hostnames = true
 
-  tags      { Name = "VPC_${var.name}_${var.region}" }
+  tags      { Name = "VPC-${var.name}-${var.env}" }
+  tags      { Env = "${var.env}" }
+  tags      { Region = "${var.region}" }
+
   lifecycle { create_before_destroy = true }
 }
 

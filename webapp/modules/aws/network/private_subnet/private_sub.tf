@@ -2,7 +2,8 @@
 # PRIVATE SUBNET MODULE CREATION
 #--------------------------------------------------------------
 
-variable "name"            { default = "private_sub"}
+variable "name"            { }
+variable "env"             { }
 variable "region"          { default = "eu-central-1" }
 variable "vpc_id"          { }
 variable "cidrs"           { }
@@ -11,17 +12,22 @@ variable "nat_gateway_ids" { }
 
 #--------------------------------------------------------------
 resource "aws_subnet" "private" {
+  #name              = "PrivSub-${var.name}-${var.env}"
   vpc_id            = "${var.vpc_id}"
   cidr_block        = "${element(split(",", var.cidrs), count.index)}"
   availability_zone = "${element(split(",", var.azs), count.index)}"
   count             = "${length(split(",", var.cidrs))}"
 
-  tags      { Name = "${var.name}_${var.region}_${element(split(",", var.azs), count.index)}" }
+  tags      { Name = "PrivSub-${var.name}-${var.env}-${element(split(",", var.azs), count.index)}" }
+  tags      { Env  = "${var.env}" }
+  tags      { Region = "${var.region}" }
+
   lifecycle { create_before_destroy = true }
 }
 
 #--------------------------------------------------------------
 resource "aws_route_table" "private" {
+  #name   = "PrivTable-${var.name}-${var.env}"
   vpc_id = "${var.vpc_id}"
   count  = "${length(split(",", var.cidrs))}"
 
@@ -31,7 +37,11 @@ resource "aws_route_table" "private" {
     nat_gateway_id = "${element(split(",", var.nat_gateway_ids), count.index)}"
   }
 
-  tags      { Name = "${var.name}__${var.region}_${element(split(",", var.azs), count.index)}" }
+  tags      { Name = "PrivTable-${var.name}-${var.env}" }
+  tags      { AZ = "${element(split(",", var.azs), count.index)}" }
+  tags      { Env  = "${var.env}" }
+  tags      { Region  = "${var.region}" }
+
   lifecycle { create_before_destroy = true }
 }
 

@@ -2,7 +2,7 @@
 # NAT GATEWAY MODULE CREATION
 #--------------------------------------------------------------
 
-variable "name"              { default = "nat_gateway" }
+variable "name"              { }
 variable "azs"               { }
 variable "public_subnet_ids" { }
 
