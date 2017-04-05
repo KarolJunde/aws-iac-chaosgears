@@ -28,7 +28,7 @@ module "vpc" {
 # BASTION MODULE PART
 #--------------------------------------------------------------
 module "public_subnet" {
-  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/public_subnet?ref=v0.0.4"
+  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/bastion?ref=v0.0.4"
 
   name   = "${var.name}"
   region = "${var.region}"
@@ -42,7 +42,7 @@ module "public_subnet" {
 # BASTION MODULE PART
 #--------------------------------------------------------------
 module "bastion" {
-  source = "./bastion"
+  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/public_subnet?ref=v0.0.4"
 
   name              = "${var.name}"
   env               = "${var.env}"
