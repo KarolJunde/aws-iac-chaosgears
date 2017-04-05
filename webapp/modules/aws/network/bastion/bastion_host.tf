@@ -58,9 +58,8 @@ module "ami" {
   instance_type = "${var.instance_type}"
 # region variable replaced with region from "webapp_dev.tfvars"
   region        = "${var.region}"
- 
-  env           = "${var.env}"
-  name          = "${var.name}"
+  #env           = "${var.env}"
+  #name          = "${var.name}"
 }
 
 #--------------------------------------------------------------

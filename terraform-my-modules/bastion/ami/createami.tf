@@ -3,8 +3,8 @@
 #--------------------------------------------------------------
 #--------------------------------------------------------------------------------------
 variable "region" {}
-variable "name" {}
-variable "env" {}
+#variable "name" {}
+#variable "env" {}
 
 #--------------------------------------------------------------------------------------
 variable "ami_image_id" {
@@ -40,9 +40,9 @@ resource "aws_instance" "instance" {
 # basing on variables choose the proper key for EC2
     key_name = "${lookup(var.key_name, var.region)}"
 
-  tags      { Name = "AMI-${var.name}" }
-  tags      { Env = "${var.env}" }
-  tags      { Region = "${var.region}" }
+#  tags      { Name = "AMI-${var.name}" }
+#  tags      { Env = "${var.env}" }
+#  tags      { Region = "${var.region}" }
   
   }
 
