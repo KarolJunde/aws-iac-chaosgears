@@ -37,8 +37,7 @@ resource "aws_route_table" "private" {
     nat_gateway_id = "${element(split(",", var.nat_gateway_ids), count.index)}"
   }
 
-  tags      { Name = "PrivTable-${var.name}-${var.env}" }
-  tags      { AZ = "${element(split(",", var.azs), count.index)}" }
+  tags      { Name = "PrivTable-${var.name}-${var.env}-${element(split(",", var.azs), count.index)}" }
   tags      { Env  = "${var.env}" }
   tags      { Region  = "${var.region}" }
 
