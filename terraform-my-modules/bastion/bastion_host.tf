@@ -9,6 +9,7 @@ variable "vpc_cidr"          { }
 variable "region"            { }
 variable "public_subnet_ids" { }
 variable "instance_type"     { }
+#variable "version"           { }
 
 variable "ami_user_data" {
   description = "My USER_DATA bootstrap file"

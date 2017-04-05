@@ -10,7 +10,7 @@ variable "region"          { }
 variable "private_subnets" { }
 variable "public_subnets"  { }
 variable "bastion_instance_type" { }
-variable "version"           { }
+#variable "version"           { }
 
 #--------------------------------------------------------------
 # VPC MODULE PART

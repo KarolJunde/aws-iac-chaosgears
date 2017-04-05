@@ -8,7 +8,7 @@ variable "public_subnets"  { }
 variable "access_key"      { }
 variable "secret_key"      { }
 variable "bastion_instance_type" { }
-variable "version"         { }
+#variable "version"         { }
 
 provider "aws" {
     access_key = "${var.access_key}"
