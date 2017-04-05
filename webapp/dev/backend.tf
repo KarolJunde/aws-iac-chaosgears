@@ -10,7 +10,6 @@ terraform {
         region 		= "eu-west-1"
 
 
-
     #  acl		= "bucket-owner-full-control"
     }
 }
