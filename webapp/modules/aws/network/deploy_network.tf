@@ -51,7 +51,7 @@ module "bastion" {
   region            = "${var.region}"
   public_subnet_ids = "${module.public_subnet.subnet_ids}"
   instance_type     = "${var.bastion_instance_type}"
-  version           = "${var.version}"
+
 }
 
 #--------------------------------------------------------------

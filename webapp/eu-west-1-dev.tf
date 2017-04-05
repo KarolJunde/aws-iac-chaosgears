@@ -26,7 +26,6 @@ module "network" {
   region          = "${var.region_name}"
   private_subnets = "${var.private_subnets}"
   public_subnets  = "${var.public_subnets}"
-  version         = "${var.version}"
 
   bastion_instance_type = "${var.bastion_instance_type}"
 }
