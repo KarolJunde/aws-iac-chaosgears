@@ -7,9 +7,10 @@ terraform {
         key 		= "terraform.tfstate"
         encrypt		= true
         lock_table 	= "DEV_STATE_LOCK"
-        region = "eu-west-1"
-    	
-        
+        region 		= "eu-west-1"
+    	access_key	= ""
+    	secret_key	= ""
+
     #  acl		= "bucket-owner-full-control"
     }
 }
