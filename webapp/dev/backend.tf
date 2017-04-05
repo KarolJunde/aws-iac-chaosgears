@@ -8,6 +8,8 @@ terraform {
         encrypt		= true
         lock_table 	= "DEV_STATE_LOCK"
         region 		= "eu-west-1"
+
+
     #  acl		= "bucket-owner-full-control"
     }
 }
