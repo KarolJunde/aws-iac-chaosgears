@@ -9,6 +9,7 @@ variable "vpc_cidr"          { }
 variable "region"            { }
 variable "public_subnet_ids" { }
 variable "instance_type"     { }
+variable "version"           { }
 
 variable "ami_user_data" {
   description = "My USER_DATA bootstrap file"
@@ -51,9 +52,8 @@ resource "aws_security_group" "bastion" {
 }
 
 #--------------------------------------------------------------
-module "ami" {
-#source = "./ami"  
-  source        = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/bastion/ami?ref=v0.0.1"
+module "ami" { 
+  source        = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/bastion/ami?ref=${var.version}"
 # instance_type variable replaced with web_instance_type from "webapp_dev.tfvars"
   instance_type = "${var.instance_type}"
 # region variable replaced with region from "webapp_dev.tfvars"

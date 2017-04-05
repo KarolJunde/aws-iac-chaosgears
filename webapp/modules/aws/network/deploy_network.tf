@@ -10,6 +10,7 @@ variable "region"          { }
 variable "private_subnets" { }
 variable "public_subnets"  { }
 variable "bastion_instance_type" { }
+variable "version"           { }
 
 #--------------------------------------------------------------
 # VPC MODULE PART
@@ -50,6 +51,7 @@ module "bastion" {
   region            = "${var.region}"
   public_subnet_ids = "${module.public_subnet.subnet_ids}"
   instance_type     = "${var.bastion_instance_type}"
+  version           = "${var.version}"
 }
 
 #--------------------------------------------------------------

@@ -5,6 +5,7 @@
 name              = "MyWebApp"
 env               = "staging"
 region_name       = "eu-west-1"
+version			  = "v0.0.1"
 
 #--------------------------------------------------------------
 # Network

@@ -5,9 +5,10 @@ variable "vpc_cidr"        { }
 variable "azs"             { }
 variable "private_subnets" { }
 variable "public_subnets"  { }
-variable "access_key"  { }
-variable "secret_key"  { }
+variable "access_key"      { }
+variable "secret_key"      { }
 variable "bastion_instance_type" { }
+variable "version"         { }
 
 provider "aws" {
     access_key = "${var.access_key}"
@@ -25,6 +26,7 @@ module "network" {
   region          = "${var.region_name}"
   private_subnets = "${var.private_subnets}"
   public_subnets  = "${var.public_subnets}"
+  version         = "${var.version}"
 
   bastion_instance_type = "${var.bastion_instance_type}"
 }
