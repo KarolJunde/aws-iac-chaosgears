@@ -28,7 +28,7 @@ module "vpc" {
 # BASTION MODULE PART
 #--------------------------------------------------------------
 module "public_subnet" {
-  source = "./public_subnet"
+  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/public_subnet?ref=v0.0.4"
 
   name   = "${var.name}"
   region = "${var.region}"
@@ -58,7 +58,7 @@ module "bastion" {
 # NAT GATEWAY MODULE PART
 #--------------------------------------------------------------
 module "nat" {
-  source = "./nat"
+  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/nat?ref=v0.0.4"
 
   name              = "${var.name}"
   azs               = "${var.azs}"
@@ -69,7 +69,7 @@ module "nat" {
 # PRIVATE SUBNET MODULE PART
 #--------------------------------------------------------------
 module "private_subnet" {
-  source = "./private_subnet"
+  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/private_subnet?ref=v0.0.4"
 
   name   = "${var.name}"
   env    = "${var.env}"
