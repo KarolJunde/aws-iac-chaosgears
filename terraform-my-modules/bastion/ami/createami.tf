@@ -40,9 +40,6 @@ resource "aws_instance" "instance" {
 # basing on variables choose the proper key for EC2
     key_name = "${lookup(var.key_name, var.region)}"
 
-  tags      { Name = "AMI-${var.name}" }
-  tags      { Env = "${var.env}" }
-  tags      { Region = "${var.region}" }
   }
 
 #--------------------------------------------------------------------------------------
