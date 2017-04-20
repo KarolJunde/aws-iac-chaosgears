@@ -2,6 +2,7 @@
     yum update -y
     yum install git stress -y
     yum install python-pip -y
+    yum install python-dev -y
     pip install --upgrade --user awscli
 #    service httpd start
 #    cd /var/www/html
