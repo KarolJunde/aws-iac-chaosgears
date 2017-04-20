@@ -1,7 +1,8 @@
 #--------------------------------------------------------------
-# General
+# GENERAL CONFIGURATION 
 #--------------------------------------------------------------
 
-name              = "global"
+name              = "IAM"
 region            = "eu-west-1"
-iam_testers        = "Bob,Mike,Thomas" # Comma separated list of admins (e.g. cameron,jay,jon,kevin)
+users_testers     = "Bob,Mike,Thomas"  # list of users
+arn       		  = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess,arn:aws:iam::aws:policy/AmazonGlacierFullAccess"

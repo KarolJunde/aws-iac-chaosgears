@@ -1,8 +1,9 @@
 variable "name"              { }
 variable "region"            { }
-variable "iam_testers"       { }
+variable "users_testers"     { }
 variable "access_key"     	 { }
 variable "secret_key"      	 { }
+variable "arn" {}
 
 provider "aws" {
     access_key = "${var.access_key}"
@@ -10,52 +11,52 @@ provider "aws" {
     region     = "${var.region}"
 }
 
-module "iam_testers" {
-  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/iam"
+module "user_group_testers" {
+ # source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/iam"
+ source = "../../terraform-my-modules/iam/"
 
-  name       = "${var.name}-tester"
-  users      = "${var.iam_testers}"
-  policy     = <<EOF
+  name       = "${var.name}_GROUP_TESTERS"
+  users      = "${var.users_testers}"
+  arn 		 = "${var.arn}"
+
+  inline_group_policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
         {
             "Effect": "Allow",
-            "Action": "s3:*",
+            "Action": [
+                "aws-portal:*Billing",
+                "aws-portal:*Usage",
+                "aws-portal:*PaymentMethods",
+                "budgets:ViewBudget",
+                "budgets:ModifyBudget"
+            ],
             "Resource": "*"
         }
     ]
 }
 EOF
 
- user_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "ec2:Describe*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
-  ]
+#inline_user_policy = <<EOF EOF
+
+#managed_user_policy = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+
 }
-EOF
-}
+
 
 output "IAM_USERS_DATA" {
   value = <<CONFIG
 
 CREATED IAM USERS WITH FOLLOWING ACCESS/SECRET KEYS:
 
-  Users: ${join("\n               ", formatlist("%s", split(",", module.iam_testers.users)))}
-  Access IDs: ${join("\n              ", formatlist("%s", split(",", module.iam_testers.access_ids)))}
-  Secret Keys: ${join("\n               ", formatlist("%s", split(",", module.iam_testers.secret_keys)))}
+  Users:    ${join(" ", formatlist("%s", split(",", module.user_group_testers.users)))}
+  Access IDs:  ${join("\n             ", formatlist("%s", split(",", module.user_group_testers.access_ids)))}
+  Secret Keys: ${join("\n              ", formatlist("%s", split(",", module.user_group_testers.secret_keys)))}
 
 CONFIG
 }
 
-output "iam_users"       { value = "${module.iam_testers.users}" }
-output "iam_access_ids"  { value = "${module.iam_testers.access_ids}" }
-output "iam_secret_keys" { value = "${module.iam_testers.secret_keys}" }
+#output "iam_users"       { value = "${module.user_group_testers.users}" }
+#output "iam_access_ids"  { value = "${module.user_group_testers.access_ids}" }
+#output "iam_secret_keys" { value = "${module.user_group_testers.secret_keys}" }
