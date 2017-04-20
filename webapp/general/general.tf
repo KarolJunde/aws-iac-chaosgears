@@ -27,7 +27,7 @@ module "iam_testers" {
     ]
 }
 EOF
-}
+
  user_policy = <<EOF
 {
   "Version": "2012-10-17",

@@ -27,7 +27,7 @@ resource "aws_iam_access_key" "key" {
   user  = "${element(aws_iam_user.user.*.name, count.index)}"
 }
 
-resource "aws_iam_user_policy" "lb_ro" {
+resource "aws_iam_user_policy" "user" {
   name = "${var.name}"
   user = "${aws_iam_user.user.*.name}"
   policy = "${var.user_policy}"
