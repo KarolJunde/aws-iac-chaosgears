@@ -4,7 +4,7 @@
 
 variable "name"   { }
 variable "users"  { }
-variable "policy" { }
+variable "group_policy" { }
 variable "user_policy" { }
 
 resource "aws_iam_group" "group" {
@@ -14,7 +14,7 @@ resource "aws_iam_group" "group" {
 resource "aws_iam_group_policy" "policy" {
   name   = "${var.name}"
   group  = "${aws_iam_group.group.id}"
-  policy = "${var.policy}"
+  policy = "${var.group_policy}"
 }
 
 resource "aws_iam_user" "user" {
