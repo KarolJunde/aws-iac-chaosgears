@@ -4,5 +4,5 @@
 
 name              = "IAM"
 region            = "eu-west-1"
-users_testers     = "Bob,Mike,Thomas"  # list of users
+users_dev     	  = "Bob,Mike,Thomas"  # list of users
 arn       		  = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess,arn:aws:iam::aws:policy/AmazonGlacierFullAccess"

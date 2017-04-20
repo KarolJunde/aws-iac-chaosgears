@@ -1,9 +1,9 @@
 variable "name"              { }
 variable "region"            { }
-variable "users_testers"     { }
+variable "users_dev"     	 { }
 variable "access_key"     	 { }
 variable "secret_key"      	 { }
-variable "arn" {}
+variable "arn" 				 { }
 
 provider "aws" {
     access_key = "${var.access_key}"
@@ -11,12 +11,12 @@ provider "aws" {
     region     = "${var.region}"
 }
 
-module "user_group_testers" {
- # source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/iam"
- source = "../../terraform-my-modules/iam/"
+module "user_group_dev" {
+ source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/iam"
+ #source = "../../terraform-my-modules/iam/"
 
-  name       = "${var.name}_GROUP_TESTERS"
-  users      = "${var.users_testers}"
+  name       = "${var.name}_GROUP_DEV"
+  users      = "${var.users_dev}"
   arn 		 = "${var.arn}"
 
   inline_group_policy = <<EOF
@@ -50,13 +50,15 @@ output "IAM_USERS_DATA" {
 
 CREATED IAM USERS WITH FOLLOWING ACCESS/SECRET KEYS:
 
-  Users:    ${join(" ", formatlist("%s", split(",", module.user_group_testers.users)))}
-  Access IDs:  ${join("\n             ", formatlist("%s", split(",", module.user_group_testers.access_ids)))}
-  Secret Keys: ${join("\n              ", formatlist("%s", split(",", module.user_group_testers.secret_keys)))}
+  Users:    ${join(" ", formatlist("%s", split(",", module.user_group_dev.users)))}
+
+  Access IDs:  ${join("\n             ", formatlist("%s", split(",", module.user_group_dev.access_ids)))}
+  
+  Secret Keys: ${join("\n              ", formatlist("%s", split(",", module.user_group_dev.secret_keys)))}
 
 CONFIG
 }
 
-#output "iam_users"       { value = "${module.user_group_testers.users}" }
-#output "iam_access_ids"  { value = "${module.user_group_testers.access_ids}" }
-#output "iam_secret_keys" { value = "${module.user_group_testers.secret_keys}" }
+#output "iam_users"       { value = "${module.user_group_dev.users}" }
+#output "iam_access_ids"  { value = "${module.user_group_dev.access_ids}" }
+#output "iam_secret_keys" { value = "${module.user_group_dev.secret_keys}" }
