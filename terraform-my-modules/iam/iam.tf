@@ -29,7 +29,7 @@ resource "aws_iam_access_key" "key" {
 
 resource "aws_iam_user_policy" "user" {
   name = "${var.name}"
-  user = "${aws_iam_user.user.*.name}"
+  user = "[${aws_iam_user.user.*.name}"]
   policy = "${var.user_policy}"
 }
 
