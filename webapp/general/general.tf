@@ -1,9 +1,9 @@
 variable "name"              { }
 variable "region"            { }
-variable "users_dev"     	 { }
+variable "users_dev"     	   { }
 variable "access_key"     	 { }
 variable "secret_key"      	 { }
-variable "arn" 				 { }
+variable "arn" 				       { }
 
 provider "aws" {
     access_key = "${var.access_key}"
@@ -17,7 +17,7 @@ module "user_group_dev" {
 
   name       = "${var.name}_GROUP_DEV"
   users      = "${var.users_dev}"
-  arn 		 = "${var.arn}"
+  arn 		   = "${var.arn}"
 
   inline_group_policy = <<EOF
 {
@@ -40,8 +40,6 @@ EOF
 
 #inline_user_policy = <<EOF EOF
 
-#managed_user_policy = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-
 }
 
 
@@ -53,12 +51,12 @@ CREATED IAM USERS WITH FOLLOWING ACCESS/SECRET KEYS:
   Users:    ${join(" ", formatlist("%s", split(",", module.user_group_dev.users)))}
 
   Access IDs:  ${join("\n             ", formatlist("%s", split(",", module.user_group_dev.access_ids)))}
-  
+
   Secret Keys: ${join("\n              ", formatlist("%s", split(",", module.user_group_dev.secret_keys)))}
 
 CONFIG
 }
 
-#output "iam_users"       { value = "${module.user_group_dev.users}" }
-#output "iam_access_ids"  { value = "${module.user_group_dev.access_ids}" }
-#output "iam_secret_keys" { value = "${module.user_group_dev.secret_keys}" }
+output "iam_users"       { value = "${module.user_group_dev.users}" }
+output "iam_access_ids"  { value = "${module.user_group_dev.access_ids}" }
+output "iam_secret_keys" { value = "${module.user_group_dev.secret_keys}" }

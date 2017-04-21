@@ -1,12 +1,12 @@
 #--------------------------------------------------------------
-# Module to create an AWS IAM group and its users
+# Module to create an AWS IAM group and its users with policies
 #--------------------------------------------------------------
 
 variable "name"   { }
 variable "users"  { }
 variable "inline_group_policy" { }
 #variable "inline_user_policy" { }
-#variable "managed_user_policy" { }
+#variable "user_managed_arn" { }
 variable "arn" { }
 
 
@@ -57,8 +57,9 @@ resource "aws_iam_access_key" "key" {
 #--------------------------------------------------------------
 
 #resource "aws_iam_user_policy_attachment" "managed_user_policy" {
-#    user  = "${var.username}"
-#    policy_arn = "${var.managed_user_policy}"
+#    count      = "${length(split(",", var.user_managed_arn))}"
+#    user       = "${var.username}"
+#    policy_arn = "${element(split(",", var.user_managed_arn), count.index)}"
 #}
 
 #--------------------------------------------------------------
