@@ -54,7 +54,6 @@ resource "aws_security_group" "bastion" {
 #--------------------------------------------------------------
 module "ami" { 
   
-#  source = "./ami" 
   source        = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/bastion/ami?ref=v0.0.4"
 # instance_type variable replaced with web_instance_type from "webapp_dev.tfvars"
   instance_type = "${var.instance_type}"
@@ -70,6 +69,7 @@ module "ami" {
 
 resource "template_file" "user_data" {
   template = "${file("${var.ami_user_data}")}"
+  #template = "${file("${path.module}/ami_user_data.sh")}"
 
   lifecycle {
     create_before_destroy = true
@@ -83,7 +83,7 @@ resource "aws_instance" "bastion" {
   subnet_id                   = "${element(split(",", var.public_subnet_ids), count.index)}"
   key_name                    = "${module.ami.key}"
   vpc_security_group_ids      = ["${aws_security_group.bastion.id}"]
-  user_data                   = "${template_file.user_data.rendered}"
+  user_data                   = "${template_file.user_data.rendered}"     #used template provider "template_file.user_data"
   associate_public_ip_address = true
 
 

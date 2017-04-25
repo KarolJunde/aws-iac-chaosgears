@@ -30,8 +30,8 @@ provider "aws" {
 
 #--------------------------------------------------------------
 module "s3amicreation" {
-  #source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/s3"
-  source = "../../terraform-my-modules/s3/"
+  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/s3"
+  #source = "../../terraform-my-modules/s3/"
 
   bucketname      = "${var.bucketname}"
   env             = "${var.env}"
