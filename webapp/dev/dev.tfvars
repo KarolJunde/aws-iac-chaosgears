@@ -4,6 +4,7 @@
 
 name              = "MyWebApp"
 env               = "staging"
+team			  = "Devs"
 region_name       = "eu-west-1"
 #version		  = "v0.0.1"
 
@@ -20,3 +21,9 @@ public_subnets  = "10.50.11.0/24,10.50.12.0/24,10.50.13.0/24" 	# Creating one pu
 bastion_instance_type = "t2.micro"
 
 #--------------------------------------------------------------
+# S3
+#--------------------------------------------------------------
+
+versioning       = true
+bucketname       = "terraformfileskarol"
+acl       		 = "private"

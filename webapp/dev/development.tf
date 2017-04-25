@@ -1,5 +1,10 @@
+#--------------------------------------------------------------
+# DEPLOY ENVIRONMENT FOR APP
+#--------------------------------------------------------------
+
 variable "name"            { }
 variable "env"             { }
+variable "team"            { }
 variable "region_name"     { }
 variable "vpc_cidr"        { }
 variable "azs"             { }
@@ -10,27 +15,36 @@ variable "secret_key"      { }
 variable "bastion_instance_type" { }
 #variable "version"         { }
 
+#--------------------------------------------------------------
+variable "bucketname"      { }
+variable "acl"             { }
+variable "versioning"      { }
+
+#--------------------------------------------------------------
 provider "aws" {
     access_key = "${var.access_key}"
     secret_key = "${var.secret_key}"
     region     = "${var.region_name}"
 }
+#--------------------------------------------------------------
 
-module "network" {
-  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/network_deploy"
+#--------------------------------------------------------------
+module "s3amicreation" {
+  #source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/s3"
+  source = "../../terraform-my-modules/s3/"
 
-  name            = "${var.name}"
+  bucketname      = "${var.bucketname}"
   env             = "${var.env}"
-  vpc_cidr        = "${var.vpc_cidr}"
-  azs             = "${var.azs}"
-  region          = "${var.region_name}"
-  private_subnets = "${var.private_subnets}"
-  public_subnets  = "${var.public_subnets}"
-
-  bastion_instance_type = "${var.bastion_instance_type}"
+  team            = "${var.team}"
+  versioning      = "${var.versioning}"
+  acl             = "${var.acl}"
 }
 
+output "s3URL" {
+  value = "${module.s3amicreation.s3URL}"
+}
 
-
-
+output "s3hostingURL" {
+  value = "${module.s3amicreation.s3hostingURL}"
+}
 
