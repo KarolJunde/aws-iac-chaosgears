@@ -58,6 +58,7 @@ module "bastion" {
 #--------------------------------------------------------------
 # NAT GATEWAY MODULE PART
 #--------------------------------------------------------------
+
 module "nat" {
   source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/nat"
 
