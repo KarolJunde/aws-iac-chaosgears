@@ -80,7 +80,7 @@ resource "aws_instance" "bastion" {
   subnet_id                   = "${element(split(",", var.public_subnet_ids), count.index)}"
   key_name                    = "${module.ami.key}"
   vpc_security_group_ids      = ["${aws_security_group.bastion.id}"]
- # user_data                   = "${template_file.user_data.rendered}"     #used template provider "template_file.user_data"
+ # user_data                   = "${template_file.user_data.rendered}"     used template provider "template_file.user_data"
   associate_public_ip_address = true
 
 
