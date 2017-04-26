@@ -55,8 +55,8 @@ provider "aws" {
 #                 MODULES
 #--------------------------------------------------------------
 module "network" {
-  source = "../../terraform-my-modules/network_deploy/"
- # source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/network_deploy"
+  #source = "../../terraform-my-modules/network_deploy/"
+  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/network_deploy"
 
   name            = "${var.name}"
   env             = "${var.env}"
