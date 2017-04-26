@@ -20,7 +20,7 @@ resource "aws_s3_bucket" "bucket" {
   tags {
 
     BucketName        = "${var.bucketname}"
-    Environment       = "${var.env}"
+    Env               = "${var.env}"
     Team              = "${var.team}"
     CreationDate      = "${timestamp()}"
   }

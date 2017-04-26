@@ -4,17 +4,12 @@
 
 variable "name"              { }
 variable "env"               { }
+variable "azs"               { }
 variable "vpc_id"            { }
 variable "vpc_cidr"          { }
 variable "region"            { }
 variable "public_subnet_ids" { }
 variable "instance_type"     { }
-#variable "version"           { }
-
-variable "ami_user_data" {
-  description = "My USER_DATA bootstrap file"
-  default = "ami_user_data.sh"
-}
 
 #--------------------------------------------------------------
 resource "aws_security_group" "bastion" {
@@ -67,29 +62,32 @@ module "ami" {
 # USE USER-DATA SCRIPT DURING BOOTSTRAPING
 #--------------------------------------------------------------
 
-resource "template_file" "user_data" {
-  template = "${file("${var.ami_user_data}")}"
+#resource "template_file" "user_data" {
+ # template = "${file("${var.ami_user_data}")}"
   #template = "${file("${path.module}/ami_user_data.sh")}"
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#  lifecycle {
+#    create_before_destroy = true
+#  }
+#}
 
 #--------------------------------------------------------------
 resource "aws_instance" "bastion" {
   ami                         = "${module.ami.id}"
   instance_type               = "${var.instance_type}"
+  # count                       = "${length(split(",", var.public_subnet_ids))}"   - not working on COMPUTED VALUE
+  count                       = "${length(split(",", var.azs))}"
   subnet_id                   = "${element(split(",", var.public_subnet_ids), count.index)}"
   key_name                    = "${module.ami.key}"
   vpc_security_group_ids      = ["${aws_security_group.bastion.id}"]
-  user_data                   = "${template_file.user_data.rendered}"     #used template provider "template_file.user_data"
+ # user_data                   = "${template_file.user_data.rendered}"     #used template provider "template_file.user_data"
   associate_public_ip_address = true
 
 
-  tags      { Name = "BASTION-${var.name}-${element(split(",", var.public_subnet_ids), count.index)}" }
+  tags      { Name   = "BASTION-${var.name}" }
+  tags      { Subnet = "${element(split(",", var.public_subnet_ids), count.index)}"}
   tags      { Region = "${var.region}" }
-  tags      { Env = "${var.env}" }
+  tags      { Env    = "${var.env}" }
 
   lifecycle { create_before_destroy = true }
 }

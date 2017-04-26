@@ -2,15 +2,14 @@
 # DEPLOY VPC WITH BASTION HOST/PRIV/PUBLIC SUBNET
 #--------------------------------------------------------------
 
-variable "name"            { }
-variable "env"             { }
-variable "vpc_cidr"        { }
-variable "azs"             { }
-variable "region"          { }
-variable "private_subnets" { }
-variable "public_subnets"  { }
-variable "bastion_instance_type" { }
-#variable "version"           { }
+variable "name"                   { }
+variable "env"                    { }
+variable "vpc_cidr"               { }
+variable "azs"                    { }
+variable "region"                 { }
+variable "private_subnets"        { }
+variable "public_subnets"         { }
+variable "bastion_instance_type"  { }
 
 #--------------------------------------------------------------
 # VPC MODULE PART
@@ -18,10 +17,10 @@ variable "bastion_instance_type" { }
 module "vpc" {
   source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/vpc"
 
-  name = "${var.name}"
-  region = "${var.region}"
-  env  = "${var.env}"
-  cidr = "${var.vpc_cidr}"
+  name    = "${var.name}"
+  region  = "${var.region}"
+  env     = "${var.env}"
+  cidr    = "${var.vpc_cidr}"
 }
 
 #--------------------------------------------------------------
@@ -42,6 +41,7 @@ module "public_subnet" {
 # BASTION MODULE PART
 #--------------------------------------------------------------
 module "bastion" {
+  #source = "../../terraform-my-modules/bastion/"
   source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/bastion"
 
   name              = "${var.name}"
@@ -51,6 +51,7 @@ module "bastion" {
   region            = "${var.region}"
   public_subnet_ids = "${module.public_subnet.subnet_ids}"
   instance_type     = "${var.bastion_instance_type}"
+  azs               = "${var.azs}"
 
 }
 
