@@ -41,8 +41,8 @@ module "public_subnet" {
 # BASTION MODULE PART
 #--------------------------------------------------------------
 module "bastion" {
-  #source = "../../terraform-my-modules/bastion/"
-  source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/bastion"
+  source = "../../terraform-my-modules/bastion/"
+  #source = "git::https://gitlab.com/KarolJunde/AWStemplate.git//terraform-my-modules/bastion"
 
   name              = "${var.name}"
   env               = "${var.env}"
