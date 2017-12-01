@@ -1,0 +1,456 @@
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "AWS Infrastructure Details"
+        Parameters:
+          - VPCCIDR
+          - PublicCIDRA
+          - PublicCIDRB
+      -
+        Label:
+          default: "Aminator instance parameters"
+        Parameters:
+          - MinSize
+          - MaxSize
+          - DesiredCapacity
+          - InstanceType
+          - KeyName
+      -
+        Label:
+          default: "Environment Configuration"
+        Parameters:
+          - Environment
+
+      -
+        Label:
+          default: "Lambda configuration"
+        Parameters:
+          - ModuleName
+          - S3Bucket
+          - S3Key
+
+Parameters:
+  VPCCIDR:
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid CIDR range in the form x.x.x.x/16
+    Default: 10.10.0.0/16
+  Environment:
+    Type: String
+    Description: Type of Environment to provision
+    Default: DEVELOPMENT
+    AllowedValues:
+      - DEVELOPMENT
+      - PREVIEW
+      - PRODUCTION
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: m1.small
+    AllowedValues:
+      - t1.micro
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - m1.small
+      - m1.medium
+      - m1.large
+      - m1.xlarge
+      - m2.xlarge
+      - m2.2xlarge
+      - m2.4xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - c1.medium
+      - c1.xlarge
+      - c3.large
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - g2.2xlarge
+      - r3.large
+      - r3.xlarge
+      - r3.2xlarge
+      - r3.4xlarge
+      - r3.8xlarge
+      - i2.xlarge
+      - i2.2xlarge
+      - i2.4xlarge
+      - i2.8xlarge
+      - d2.xlarge
+      - d2.2xlarge
+      - d2.4xlarge
+      - d2.8xlarge
+      - hi1.4xlarge
+      - hs1.8xlarge
+      - cr1.8xlarge
+      - cc2.8xlarge
+      - cg1.4xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+  MinSize:
+    Type: String
+    Description: Minimum number of Aminator servers
+    Default: "1"
+  MaxSize:
+    Type: String
+    Description: Maximum number of Aminator Instances
+    Default: "1"
+  DesiredCapacity:
+    Type: String
+    Description: Nominal Size of Aminator Env
+    Default: "1"
+  ModuleName:
+    Description: The name of the JavaScript file
+    Type: String
+    Default: foundationami
+  S3Bucket:
+    Type: String
+    Description: S3 bucket for templates, source codes
+    Default:
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9-]*"
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  S3Key:
+    Description: The name of the ZIP package
+    Type: String
+    Default: foundationami.zip
+
+  PublicCIDRA:
+    Type: String
+    Description: CIDR to use for public subnet A for Aminator Environment.
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid CIDR range in the form x.x.x.x/22
+    Default: 10.10.0.0/22
+  PublicCIDRB:
+    Type: String
+    Description: CIDR to use for public subnet B for Aminator Environment.
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid CIDR range in the form x.x.x.x/22
+    Default: 10.10.4.0/22
+  KeyName:
+    Description: The EC2 Key Pair to allow SSH access to the instances
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[-_ a-zA-Z0-9]*'
+    ConstraintDescription: Can contain only alphanumeric characters, spaces, dashes
+      and underscores.
+
+Mappings:
+  InstanceSize:
+    DEVELOPMENT:
+      "EC2" : "t2.micro"
+    PREVIEW:
+      "EC2" : "t2.micro"
+    PRODUCTION:
+      "EC2" : "t2.small"
+  AWSInstanceType2Arch:
+    t1.micro:
+      Arch: PV64
+    t2.micro:
+      Arch: HVM64
+    t2.small:
+      Arch: HVM64
+    t2.medium:
+      Arch: HVM64
+    m1.small:
+      Arch: PV64
+    m1.medium:
+      Arch: PV64
+    m1.large:
+      Arch: PV64
+    m1.xlarge:
+      Arch: PV64
+    m2.xlarge:
+      Arch: PV64
+    m2.2xlarge:
+      Arch: PV64
+    m2.4xlarge:
+      Arch: PV64
+    m3.medium:
+      Arch: HVM64
+    m3.large:
+      Arch: HVM64
+    m3.xlarge:
+      Arch: HVM64
+    m3.2xlarge:
+      Arch: HVM64
+    c1.medium:
+      Arch: PV64
+    c1.xlarge:
+      Arch: PV64
+    c3.large:
+      Arch: HVM64
+    c3.xlarge:
+      Arch: HVM64
+    c3.2xlarge:
+      Arch: HVM64
+    c3.4xlarge:
+      Arch: HVM64
+    c3.8xlarge:
+      Arch: HVM64
+    c4.large:
+      Arch: HVM64
+    c4.xlarge:
+      Arch: HVM64
+    c4.2xlarge:
+      Arch: HVM64
+    c4.4xlarge:
+      Arch: HVM64
+    c4.8xlarge:
+      Arch: HVM64
+    g2.2xlarge:
+      Arch: HVMG2
+    r3.large:
+      Arch: HVM64
+    r3.xlarge:
+      Arch: HVM64
+    r3.2xlarge:
+      Arch: HVM64
+    r3.4xlarge:
+      Arch: HVM64
+    r3.8xlarge:
+      Arch: HVM64
+    i2.xlarge:
+      Arch: HVM64
+    i2.2xlarge:
+      Arch: HVM64
+    i2.4xlarge:
+      Arch: HVM64
+    i2.8xlarge:
+      Arch: HVM64
+    d2.xlarge:
+      Arch: HVM64
+    d2.2xlarge:
+      Arch: HVM64
+    d2.4xlarge:
+      Arch: HVM64
+    d2.8xlarge:
+      Arch: HVM64
+    hi1.4xlarge:
+      Arch: HVM64
+    hs1.8xlarge:
+      Arch: HVM64
+    cr1.8xlarge:
+      Arch: HVM64
+    cc2.8xlarge:
+      Arch: HVM64
+
+Resources:
+  VPC:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: !Ref VPCCIDR
+  IGW:
+    Type: "AWS::EC2::InternetGateway"
+  GatewayAttach:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      InternetGatewayId: !Ref IGW
+      VpcId: !Ref VPC
+  SubnetPublicA: # Public Subnet for Aminator Env in AZ - A
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !Select [0, !GetAZs ]
+      CidrBlock: !Ref PublicCIDRA
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref VPC
+  SubnetPublicB: # Public Subnet for Aminator Env in AZ - B
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !Select [1, !GetAZs ]
+      CidrBlock: !Ref PublicCIDRB
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref VPC
+  SubnetRouteTableAssociatePublicA: # Associates the subnet with a route table
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      SubnetId: !Ref SubnetPublicA
+  SubnetRouteTableAssociatePublicB:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      SubnetId: !Ref SubnetPublicB
+  RouteDefaultPublic:
+    Type: "AWS::EC2::Route"
+    DependsOn: GatewayAttach
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+      RouteTableId: !Ref RouteTablePublic
+  RouteTablePublic:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref VPC
+  SG:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: !Join ["", ["Stack ", !Ref "AWS::StackId", " - ", !Ref Environment]]
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        -
+          CidrIp: 31.182.172.39/32
+          IpProtocol: tcp
+          ToPort: "22"
+          FromPort: "22"
+      SecurityGroupEgress:
+        -
+          CidrIp: 0.0.0.0/0
+          ToPort: "-1"
+          IpProtocol: "-1"
+
+  AminatorIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: AminatorPolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:AttachVolume
+                  - ec2:CopyImage
+                  - ec2:CopySnapshot
+                  - ec2:CreateImage
+                  - ec2:CreateSnapshot
+                  - ec2:CreateTags
+                  - ec2:CreateVolume
+                  - ec2:DeleteSnapshot
+                  - ec2:DeleteTags
+                  - ec2:DeleteVolume
+                  - ec2:DeregisterImage
+                  - ec2:DetachVolume
+                  - ec2:ModifyImageAttribute
+                  - ec2:ModifySnapshotAttribute
+                  - ec2:ModifyVolumeAttribute
+                  - ec2:RegisterImage
+                  - ec2:ResetImageAttribute
+                  - ec2:ResetSnapshotAttribute
+                  - ec2:Describe*
+                  - s3:Get*
+                  - s3:List*
+                Resource: '*'
+
+  AminatorInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref AminatorIamRole
+
+  AminatorASG:
+    UpdatePolicy:
+      AutoScalingRollingUpdate:
+        MinInstancesInService: 1
+        MaxBatchSize: 1
+        PauseTime: PT5M
+        WaitOnResourceSignals: true
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: !Ref 'AminatorLaunchConfig'
+      DesiredCapacity: !Ref DesiredCapacity
+      HealthCheckGracePeriod: 60
+      HealthCheckType: EC2
+      MaxSize: !Ref MaxSize
+      MinSize: !Ref MinSize
+      Cooldown: 120
+      VPCZoneIdentifier:
+        - !Ref SubnetPublicA
+        - !Ref SubnetPublicB
+      Tags:
+        - Key: Name
+          Value: Aminator
+          PropagateAtLaunch: true
+        - Key: Env
+          Value: !Ref Environment
+          PropagateAtLaunch: true
+        - Key: Owner
+          Value: 'ChaosGears'
+          PropagateAtLaunch: true
+
+  AminatorLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      KeyName: !Ref KeyName
+      ImageId: !GetAtt AMIInfo.Id
+      SecurityGroups:
+        - !Ref SG
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref AminatorInstanceProfile
+
+  AMIInfo:
+    Type: "Custom::AMIInfo"
+    Properties:
+      ServiceToken: !GetAtt AMIInfoFunction.Arn
+      Region: !Ref AWS::Region
+      Architecture: !FindInMap [AWSInstanceType2Arch, !Ref InstanceType, Arch]
+
+  AMIInfoFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: !Ref S3Key
+      Handler: !Join ['', [!Ref ModuleName, .handler]]
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs4.3
+      Timeout: 30
+
+  LambdaExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeImages
+                Resource: '*'
+
+Outputs:
+  AMIID:
+    Description: The Amazon EC2 instance AMI ID.
+    Value: !GetAtt 'AMIInfo.Id'

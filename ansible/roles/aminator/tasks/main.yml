@@ -1,0 +1,91 @@
+---
+
+- name: 'Ensure latest boto is installed'
+  pip:
+    name: 'boto'
+    state: 'latest'
+
+
+- name: 'Create config directory'
+  file:
+    name: '/etc/aminator'
+    state: 'directory'
+    owner: 'root'
+    group: 'root'
+    mode: 0755
+  tags: 'directories'
+
+
+- name: 'Create logging directory'
+  file:
+    name: '/var/log/aminator'
+    state: 'directory'
+    owner: 'root'
+    group: 'root'
+    mode: 0755
+  tags: 'directories'
+
+
+- name: 'Create working directories'
+  file:
+    name: '{{ item }}'
+    state: 'directory'
+    owner: 'root'
+    group: 'root'
+    mode: 0755
+  with_items:
+    - /var/aminator
+    - /var/aminator/lock
+    - /var/aminator/volumes
+  tags: 'directories'
+
+
+- name: 'Checkout Aminator code from Github'
+  git:
+    repo: '{{ aminator_repo }}'
+    dest: '/usr/local/aminator'
+    version: '{{ aminator_branch }}'
+  tags: 'aminator'
+
+
+- name: 'Install Aminator'
+  command: 'python setup.py install chdir=/usr/local/aminator'
+  tags: 'aminator'
+
+
+- name: 'Copy config files'
+  copy:
+    src: '/usr/local/aminator/aminator/default_conf/{{ item }}'
+    dest: '/etc/aminator/{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: 0440
+  with_items:
+    - aminator.yml
+    - environments.yml
+    - logging.yml
+  tags: 'aminator'
+
+
+- name: 'Install Ansible provisioner plugin'
+  command: 'aminator-plugin install ansible'
+  tags: 'ansible-plugin'
+
+
+- name: 'Copy environments config that contains the plugins'
+  copy:
+    src: 'environments.yml'
+    dest: '/etc/aminator/environments.yml'
+    owner: 'root'
+    group: 'root'
+    mode: 0644
+  tags: 'config'
+
+
+#Distributes an AMI by copying it to one, many
+#or all AWS regions, and by optionally making the AMIs and Snapshots public or shared with specific AWS Accounts
+- name: 'Install DistAMI'
+  pip:
+    name: 'distami'
+    state: 'latest'
+  tags: 'distami-setup'

@@ -1,0 +1,5 @@
+---
+
+apt_state : 'latest'
+yum_state: 'latest'
+yum_security: true
