@@ -46,8 +46,9 @@
             "ami-images/{{user `ami-type`}}/roles/base",
             "ami-images/{{user `ami-type`}}/roles/aminator"
         ],
-        "playbook_dir": "ami-images/aminator/playbooks",
+        "playbook_dir": "ami-images/aminator/playbooks"
     },
+
     {
       "type": "shell",
       "inline": [
