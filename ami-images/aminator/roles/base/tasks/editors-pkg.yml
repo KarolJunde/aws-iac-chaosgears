@@ -1,0 +1,19 @@
+---
+
+- name: 'Install editor packages'
+  apt:
+    pkg: '{{ item }}'
+    state: 'latest'
+  with_items:
+    - nano
+    - vim
+  when: ansible_distribution == 'ubuntu'
+
+
+- name: 'Install editors packages (yum version)'
+  yum:
+    pkg: '{{ item }}'
+    state: 'latest'
+  with_items:
+    - vim-enhanced
+  when: ansible_distribution == 'amazon'

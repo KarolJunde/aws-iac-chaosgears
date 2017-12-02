@@ -1,0 +1,29 @@
+---
+
+- name: 'Add auto-removal to crond'
+  cron:
+    cron_file: 'apt_get_autoremove'
+    job: '/usr/bin/apt-get autoremove --purge -y'
+    name: 'apt-get-autoremove'
+    special_time: 'daily'
+    state: 'present'
+    user: 'root'
+  when: ansible_distribution == 'ubuntu'
+
+- name: 'Ensure APT sources list includes multiverse'
+  copy:
+    src: '{{ ansible_distribution }}/{{ ansible_distribution_release }}/sources.list'
+    dest: '/etc/apt/sources.list'
+    owner: 'root'
+    group: 'root'
+    mode: 0444
+  when: ansible_distribution == 'ubuntu'
+
+- name: 'Patch cloud-init APT sources template'
+  template:
+    src: 'sources.list-precise.j2'
+    dest: '/etc/cloud/templates/sources.list.tmpl'
+    owner: 'root'
+    group: 'root'
+    mode: 0444
+  when: ansible_distribution == 'ubuntu'

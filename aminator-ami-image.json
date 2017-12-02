@@ -1,0 +1,56 @@
+{
+    "variables": {
+        "aws_region": "{{env `AWS_REGION`}}",
+        "aws_ami_name": "amzn-ami-chaosgears-aminator",
+        "ami_type": "aminator",
+        "retention_days": "30",
+        "team_name": "ChaosGears",
+        "environemt": "Development"
+    },
+
+    "builders": [{
+        "type": "amazon-ebs",
+        "region": "{{user `aws_region`}}",
+        "instance_type": "t2.micro",
+        "ssh_username": "ec2-user",
+        "ami_name": "{{user `aws_ami_name`}}",
+        "tags": {
+          "Region": "{{user `aws_region`}}",
+          "Env": "{{user `environemt`}}",
+          "Name": "{{user `ami_type`}}",
+          "CreationTime": "{{isotime \"02-Jan-2006\"}}",
+          "Retention": "{{user `retention_days`}}"
+        },
+        "source_ami_filter": {
+            "filters": {
+                "virtualization-type": "hvm",
+                "name": "amzn-ami-hvm*x86_64-gp2",
+                "root-device-type": "ebs"
+            },
+            "owners": ["505861742066"],
+            "most_recent": true
+        }
+    }],
+
+    "provisioners": [
+    {
+        "type": "shell",
+        "inline": [
+            "sudo pip install ansible"
+        ]
+    },
+    {
+        "type": "ansible-local",
+        "playbook_file": "ami-images/{{user `ami-type`}}/playbooks/aminator-amazon-linux.yaml",
+        "role_paths": [
+            "ami-images/{{user `ami-type`}}/roles/base",
+            "ami-images/{{user `ami-type`}}/roles/aminator"
+        ],
+        "playbook_dir": "ami-images/aminator/playbooks",
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "rm .ssh/authorized_keys ; sudo rm /root/.ssh/authorized_keys"
+      ]
+    }

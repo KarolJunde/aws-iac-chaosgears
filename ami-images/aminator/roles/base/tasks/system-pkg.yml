@@ -1,0 +1,100 @@
+---
+
+- name: 'Install system packages'
+  apt:
+    pkg: '{{ item }}'
+    state: '{{ apt_state }}'
+    update_cache: true
+  with_items:
+    - git-core
+    - less
+    - debfoster
+    - perl
+    - perl-modules
+    - python
+    - python-support
+    - python-pip
+    - sudo
+    - curl
+    - sysstat
+    - unzip
+    - xfsprogs
+    - zip
+  when: ansible_distribution == 'ubuntu'
+
+
+- name: 'Install system packages (yum version)'
+  yum:
+    pkg: '{{ item }}'
+    state: '{{ yum_state }}'
+    security: '{{ yum_security }}'
+    update_cache: true
+  with_items:
+    - git
+    - less
+    - perl
+    - python
+    - python-pip
+    - sudo
+    - unzip
+    - curl
+    - xfsprogs
+    - zip
+  when: ansible_distribution == 'amazon'
+
+
+- name: 'Install boto Python library'
+  pip:
+    name: 'boto'
+    state: 'latest'
+
+
+- name: 'Install AWS CLI'
+  pip:
+    name: 'awscli'
+    state: 'latest'
+
+
+- name: 'Install AWS-SHELL'
+  pip:
+    name: 'aws-shell'
+    state: 'latest'
+
+
+- name: 'Install s3get to be used by user-data on boot'
+  copy:
+    src: 's3get'
+    dest: '/usr/bin/s3get'
+    owner: 'root'
+    group: 'root'
+    mode: 0755
+
+
+- name: 'Copy ec2metadata script'
+  copy:
+    src: '{{ ansible_distribution }}/ec2metadata'
+    dest: '/usr/bin/ec2metadata'
+    owner: 'root'
+    group: 'root'
+    mode: 0755
+  when: ansible_distribution == 'amazon'
+  tags: ec2metadata
+
+
+- name: 'Copy rc.local template'
+  copy:
+    src: '{{ ansible_distribution }}/rc.local'
+    dest: '{{ rc_local_path }}'
+    owner: 'root'
+    group: 'root'
+    mode: 0755
+
+
+- name: 'Get cloud-init to manage hosts file'
+  lineinfile:
+    dest: '/etc/cloud/cloud.cfg'
+    state: 'present'
+    line: 'manage_etc_hosts: True'
+    regexp: '^manage_etc_hosts\: True'
+    insertafter: '^preserve_hostname'
+  tags: cloud-init

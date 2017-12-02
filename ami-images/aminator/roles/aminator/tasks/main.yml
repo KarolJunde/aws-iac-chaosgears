@@ -67,6 +67,14 @@
   tags: 'aminator'
 
 
+- name: 'Checkout ChaosGears-ansible code for Aminator'
+  git:
+    repo: 'https://github.com/KarolJunde/aws-iac-chaosgears.git'
+    dest: '/usr/local/chaosgears-ansible'
+    version: 'master'
+  tags: 'chaosgears'
+
+
 - name: 'Install Ansible provisioner plugin'
   command: 'aminator-plugin install ansible'
   tags: 'ansible-plugin'

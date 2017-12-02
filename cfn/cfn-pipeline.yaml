@@ -1,0 +1,512 @@
+﻿
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Baking-AMI-Pipeline
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "GitHub Parameters"
+        Parameters:
+          - GitHubRepo
+          - GitHubUser
+          - GitHubToken
+      -
+        Label:
+          default: "SNS Parameters"
+        Parameters:
+          - ApprovalEmail
+          - Topic
+      -
+        Label:
+          default: "ArtifactStore"
+        Parameters:
+          - SourceRepositoryS3
+          - ArtifactStoreS3
+      -
+        Label:
+          default: "BuilderEnv"
+        Parameters:
+          - BuilderVPC
+          - BuilderPublicSubnet
+          - CodeBuildEnv
+
+    ParameterLabels:
+      BuilderVPC:
+        default: "Which VPC should I use?"
+      BuilderPublicSubnet:
+        default: "Which Public Subnet should I use?"
+      CodeBuildEnv:
+        default: "Should I use a different Docker Image?"
+      ApprovalEmail:
+        default: "Who should I notify upon completion?"
+
+Parameters:
+  GitHubRepo:
+    Description: GitHub Repository Name
+    Type: String
+    Default: NubesBuild
+  #  AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+  #  ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  GitHubUser:
+    Type: String
+    Description: GitHub User
+    Default: KarolJunde
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  GitHubToken:
+    Type: String
+    Description: GitHub token
+   # AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+   # ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  Topic:
+    Type: String
+    Description: SNS Topic For Approval after Base AMI Build
+    Default: BaseAMI-Notify
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9-]*"
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  SourceRepositoryS3:
+    Type: String
+    Description: S3 bucket for templates, source codes
+    Default: s3-cfn-templates-chaosgears
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9-]*"
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  ArtifactStoreS3:
+    Type: String
+    Description: S3 bucket for CodeBuild artifacts
+    Default: s3-build-artifacts-chaosgears
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9-]*"
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  ApprovalEmail:
+    Type: String
+    Description: Email address to which User approval should be sent
+    Default: karol.junde@gmail.com
+    AllowedPattern: "([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)"
+    ConstraintDescription: Must be a valid email address. (e.g. name@example.com)
+  BuilderVPC:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID that AMI Builder will use to launch temporary resource
+  BuilderPublicSubnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: Public Subnet ID that AMI Builder will use to launch temporary resource
+  CodeBuildEnv:
+    Type: String
+    Default: "nodejs:7.0.0"
+    Description: Docker image to use for CodeBuild container - Use http://amzn.to/2mjCI91 for reference
+
+Resources:
+    ##################
+    # S3 Source Repo #
+    ##################
+
+  SourceBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref SourceRepositoryS3
+
+    ####################
+    # S3 Artifact Repo #
+    ####################
+
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref ArtifactStoreS3
+
+    ####################
+    # SNS Notification #
+    ####################
+
+  AMIBuilderApprovalTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      Subscription:
+        -
+          Endpoint: !Ref ApprovalEmail
+          Protocol: "email"
+      TopicName: !Ref Topic
+
+  AMIBuilderSNSTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Id: AllowCloudwatchEventsToPublish
+        Version: '2012-10-17'
+        Statement:
+          - 
+            Sid: Statement-id
+            Effect: Allow
+            Principal:
+              Service: "events.amazonaws.com"
+            Action: sns:Publish
+            Resource: !Ref AMIBuilderApprovalTopic
+      Topics:
+        - !Ref AMIBuilderApprovalTopic
+
+  AmiBuilderCustomEvent:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: "AMIBuilder-Complete"
+      EventPattern:
+        source:
+          - "com.ami.builder"
+        detail-type:
+          - "AMIBuilder"
+        detail:
+          AmiStatus:
+            - "Created"
+      State: "ENABLED"
+
+      Targets:
+        -
+          Id: "NewBaseAMI-Notify"
+          Arn: !Ref AMIBuilderApprovalTopic
+
+##############################
+  CodeDeployIAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - 'codedeploy.amazonaws.com'
+          Action:
+          - 'sts:AssumeRole'
+      Path: '/'
+      ManagedPolicyArns:
+      - 'arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole'
+
+##############################
+  Application:
+    Type: "AWS::CodeDeploy::Application"
+##############################
+  DeploymentGroup:
+    Type: "AWS::CodeDeploy::DeploymentGroup"
+    Properties:
+      ApplicationName: !Ref Application
+      Ec2TagFilters:
+        - Key: DeploymentGroup
+          Type: KEY_AND_VALUE
+          Value: !Ref AWS::StackName
+      ServiceRoleArn: !Sub '${CodeDeployIAMRole.Arn}'
+
+##############################
+  PipeLineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        -
+          PolicyName: "CodePipelinePackerNestedPolicy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - codepipeline:*
+                  - iam:ListRoles
+                  - cloudformation:*
+                  - codecommit:List*
+                  - codecommit:Get*
+                  - codecommit:GitPull
+                  - codecommit:UploadArchive
+                  - codecommit:CancelUploadArchive
+                  - iam:PassRole
+                  - s3:ListAllMyBuckets
+                  - s3:GetBucketLocation
+                  - lambda:InvokeFunction
+                  - lambda:ListFunctions
+                  - lambda:GetFunctionConfiguration
+                  - ec2:*
+                  - elasticloadbalancing:*
+                  - autoscaling:*
+                  - cloudwatch:*
+                Resource:
+                  - "*"
+              -
+                Action:
+                  - codedeploy:CreateDeployment
+                  - codedeploy:GetApplicationRevision
+                  - codedeploy:GetDeployment
+                  - codedeploy:GetDeploymentConfig
+                  - codedeploy:RegisterApplicationRevision
+                Resource: "*"
+                Effect: Allow
+              -
+                Effect: "Allow"
+                Action:
+                  - "codebuild:StartBuild"
+                  - "codebuild:BatchGetBuilds"
+                Resource:
+                  - Fn::Sub: arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/BuildAMI-${AWS::StackName}-${AWS::Region}
+                  - Fn::Sub: arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:build/BuildAMI-${AWS::StackName}-${AWS::Region}:*
+              -
+                Effect: "Allow"
+                Action:
+                  - "sns:Publish"
+                Resource:
+                  - !Sub ${AMIBuilderApprovalTopic}
+              -
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetBucketPolicy
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                 - !Join ['',['arn:aws:s3:::',!Ref ArtifactBucket, '/*']]
+                 - !Join ['',['arn:aws:s3:::',!Ref ArtifactBucket]]
+                 - !Join ['',['arn:aws:s3:::',!Ref SourceBucket, '/*']]
+                 - !Join ['',['arn:aws:s3:::',!Ref SourceBucket]]
+
+          PolicyName: !Sub ${AWS::StackName}-policy-${AWS::Region}
+##############################
+  CloudFormationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-cloudformation-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+##############################
+  CloudFormationPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${AWS::StackName}-cloudformation-policy-${AWS::Region}
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Action:
+              - lambda:AddPermission
+              - lambda:CreateFunction
+              - lambda:DeleteFunction
+              - lambda:InvokeFunction
+              - lambda:RemovePermission
+              - lambda:UpdateFunctionCode
+              - lambda:GetFunctionConfiguration
+              - lambda:GetFunction
+              - lambda:UpdateFunctionConfiguration
+              - iam:CreateRole
+              - iam:CreatePolicy
+              - iam:GetRole
+              - iam:DeleteRole
+              - iam:PutRolePolicy
+              - iam:PassRole
+              - iam:DeleteRolePolicy
+              - cloudformation:*
+            Resource: "*"
+          -
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetBucketPolicy
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+             - !Join ['',['arn:aws:s3:::',!Ref ArtifactBucket, '/*']]
+             - !Join ['',['arn:aws:s3:::',!Ref ArtifactBucket]]
+             - !Join ['',['arn:aws:s3:::',!Ref SourceBucket, '/*']]
+             - !Join ['',['arn:aws:s3:::',!Ref SourceBucket]]
+      Roles:
+        -
+          !Ref CloudFormationRole
+############################## CODE BUILD ROLE ##############################
+  CodeBuildRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName:
+        Fn::Sub: CodeBuildRole-${AWS::StackName}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "codebuild.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: /service-role/
+      Policies:
+        -
+          PolicyName: "CodeBuildAMIAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "cloudformation:Get*"
+                  - "cloudformation:Describe*"
+                  - "cloudformation:List*"
+                Resource:
+                  - Fn::Sub: arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/Dev-${AWS::StackName}*
+              -
+                Effect: "Allow"
+                Action:
+                  - "ec2:*"
+                  - "cloudformation:ValidateTemplate"
+                  - "elasticloadbalancing:Describe*"
+                  - "autoscaling:Describe*"
+                  - "iam:Get*"
+                  - "iam:List*"
+                  - "logs:Describe*"
+                  - "logs:Get*"
+                  - "tag:Get*"
+                  - "events:*"
+
+                Resource:
+                  - "*"
+              -
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+
+                Resource:
+                  - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
+              -
+                Effect: "Allow"
+                Action:
+                  - "s3:PutObject"
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:ListBucket"
+                Resource:
+                  - Fn::Sub: arn:aws:s3:::codepipeline-${AWS::Region}-*
+                  - Fn::Sub: arn:aws:s3:::${ArtifactBucket}/*
+                  - Fn::Sub: arn:aws:s3:::${ArtifactBucket}
+                  - Fn::Sub: arn:aws:s3:::${SourceBucket}/*
+                  - Fn::Sub: arn:aws:s3:::${SourceBucket}
+
+############################## BUILD AMI - CODEBUILD ##############################
+  BuildAMIProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name:
+        Fn::Sub: BuildAMI-${AWS::StackName}-${AWS::Region}
+      Description: Build AMI
+      ServiceRole:
+        Fn::GetAtt: [ CodeBuildRole, Arn ]
+
+      Artifacts:
+        Type: CODEPIPELINE
+      #  Packaging: ZIP
+        Location: !Ref ArtifactBucket
+        Name:
+          Fn::Sub: Build-${AWS::StackName}
+
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: !Sub aws/codebuild/${CodeBuildEnv}
+        EnvironmentVariables:
+          - Name: OUTPUT_BUCKET
+            Value: !Ref ArtifactBucket
+          - Name: TEMPLATE_PREFIX
+            Value: codebuild
+
+      Source:
+        Type: CODEPIPELINE
+
+      TimeoutInMinutes: 15
+     # EncryptionKey:
+     #   Fn::Sub: arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/s3
+      Tags:
+        - Key: Name
+          Value: !Sub Build-${AWS::StackName}
+
+############################## STAGE 1
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    DependsOn: PipeLineRole
+    Properties:
+      ArtifactStore:
+        Location: !Ref SourceBucket
+        Type: S3
+      RoleArn: !GetAtt PipeLineRole.Arn
+      Name: !Ref AWS::StackName
+      Stages:
+        - Name: GitHubInvoke
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              Configuration:
+                Owner: !Ref GitHubUser
+                Repo: !Ref GitHubRepo
+                Branch: master
+                OAuthToken: !Ref GitHubToken
+              OutputArtifacts:
+                - Name: CFNTemplateOutput
+              RunOrder: 1
+############################## STAGE 2
+        - Name: Build
+          Actions:
+            - Name: CodeBuild
+              InputArtifacts:
+                - Name: CFNTemplateOutput
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              OutputArtifacts:
+                - Name: BuildArtifact
+              Configuration:
+                ProjectName: !Ref BuildAMIProject
+              RunOrder: 1
+############################## STAGE 3
+        - Name: Approve
+          Actions:
+            - Name: ApproveBuild
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Version: 1
+                Provider: Manual
+              Configuration:
+                NotificationArn: !Ref AMIBuilderApprovalTopic
+                CustomData: New AMI has been built!! Approve once AMI build has been completed.
+              RunOrder: 2
+Outputs:
+  resbucketurl:
+    Description: URL for Artifact Bucket
+    Value: !Ref ArtifactBucket
+  templatesbucket:
+    Description: URL for Bucket of Source Templates
+    Value: !Ref ArtifactBucket
+  AMIBuildSNSTopic:
+    Value: !GetAtt AMIBuilderApprovalTopic.TopicName
+    Description: Name of the SNS Topic for Approval

@@ -1,0 +1,8 @@
+---
+
+- include: 'basic-hardening.yml'
+- include: 'editors-pkg.yml'
+- include: 'network-pkg.yml'
+- include: 'repo-setup.yml'
+- include: 'security-pkg.yml'
+- include: 'system-pkg.yml'
