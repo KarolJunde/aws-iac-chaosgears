@@ -8,8 +8,8 @@ phases:
       - curl -qL -o packer.zip https://releases.hashicorp.com/packer/0.12.3/packer_0.12.3_linux_amd64.zip && unzip packer.zip
       - echo "Installing jq..." #jq for JSON parsing
       - curl -qL -o jq https://stedolan.github.io/jq/download/linux64/jq && chmod +x ./jq
-      - echo "Validating aminator-ami-image.json.json"
-      - ./packer validate aminator-ami-image.json.json
+      - echo "Validating aminator-ami-image.json"
+      - ./packer validate aminator-ami-image.json
   build:
     commands:
       ### HashiCorp Packer cannot currently obtain the AWS CodeBuild-assigned role and its credentials

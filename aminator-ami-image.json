@@ -18,7 +18,7 @@
           "Region": "{{user `aws_region`}}",
           "Env": "{{user `environemt`}}",
           "Name": "{{user `ami_type`}}",
-          "CreationTime": "{{isotime \"02-Jan-2006\"}}",
+          "CreationTime": "{{isotime "2006-01-02"}}",
           "Retention": "{{user `retention_days`}}"
         },
         "source_ami_filter": {
