@@ -1,0 +1,77 @@
+---
+
+- name: 'Install networking packages'
+  apt:
+    pkg: '{{ item }}'
+    state: '{{ apt_state }}'
+    update_cache: true
+  with_items:
+    - dnsutils
+    - lynx
+    - openssh-client
+    - openssh-server
+    - ngrep
+    - ntp
+    - rsync
+    - ssh
+    - tcpdump
+    - telnet
+    - traceroute
+  when: ansible_distribution == 'ubuntu'
+
+
+- name: 'Install networking packages (yum version)'
+  yum:
+    pkg: '{{ item }}'
+    state: '{{ yum_state }}'
+    security: '{{ yum_security }}'
+    update_cache: true
+  with_items:
+    - lynx
+    - openssh-clients
+    - openssh-server
+    - ngrep
+    - ntp
+    - rsync
+    - tcpdump
+    - telnet
+    - traceroute
+  when: ansible_distribution == 'amazon'
+
+
+- name: 'Make sure rsync is not running as a service'
+  systemd:
+    name: 'rsync'
+    enabled: false
+    state: 'stopped'
+  when: ansible_distribution == 'ubuntu'
+
+
+- name: 'Enable NTP service'
+  systemd:
+    name: '{{ ntp_service_name }}'
+    enabled: false
+    state: 'started'
+
+
+- name: 'Set SSH config'
+  template:
+    src: '{{ ansible_distribution }}/sshd_config'
+    dest: '/etc/ssh/ssh_config'
+    owner: 'root'
+    group: 'root'
+    mode: 0440
+
+- name: 'Set SSHd config'
+  copy:
+    src: '{{ ansible_distribution }}/sshd_config'
+    dest: '/etc/ssh/sshd_config'
+    owner: 'root'
+    group: 'root'
+    mode: 0440
+
+- name: 'Enable SSH service'
+  systemd:
+    name: '{{ ssh_service_name }}'
+    enabled: true
+    state: 'started'

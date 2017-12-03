@@ -1,0 +1,27 @@
+---
+
+- name: 'Install security packages'
+  apt:
+    pkg: '{{ item }}'
+    state: '{{ apt_state }}'
+    update_cache: true
+  with_items:
+    - fail2ban
+    - openssl
+  when: ansible_distribution == 'ubuntu'
+
+- name: 'Install security packages (yum version)'
+  yum:
+    pkg: '{{ item }}'
+    state: '{{ yum_state }}'
+    security: '{{ yum_security }}'
+    update_cache: true
+  with_items:
+    - fail2ban
+  when: ansible_distribution == 'amazon'
+
+- name: 'Enable fail2ban service'
+  systemd:
+    name: 'fail2ban'
+    enabled: true
+    state: 'started'
