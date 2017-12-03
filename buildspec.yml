@@ -35,7 +35,7 @@ phases:
       #send info about new AMI to cloudwatch events
       #http://docs.aws.amazon.com/cli/latest/reference/events/put-events.html
       - aws events put-events --entries file://ami_build_event.json
-      - echo "Packer build completed on `date`"
+      - echo "Packer build completed BASE AMI on `date`"
 artifacts:
   files:
     - ami_build_event.json

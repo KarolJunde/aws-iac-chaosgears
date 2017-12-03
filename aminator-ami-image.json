@@ -1,7 +1,7 @@
 {
     "variables": {
         "aws_region": "{{env `AWS_REGION`}}",
-        "aws_ami_name": "amzn-ami-chaosgears-aminator",
+        "aws_ami_name": "BaseAMI",
         "ami_type": "aminator",
         "retention_days": "30",
         "team_name": "ChaosGears",
@@ -13,7 +13,7 @@
         "region": "{{user `aws_region`}}",
         "instance_type": "t2.micro",
         "ssh_username": "ec2-user",
-        "ami_name": "{{user `aws_ami_name`}}",
+        "ami_name": "amzn-ami-chaosgears-{{user `aws_ami_name`}}",
         "tags": {
           "Region": "{{user `aws_region`}}",
           "Env": "{{user `environemt`}}",
@@ -43,8 +43,7 @@
         "type": "ansible-local",
         "playbook_file": "ami-images/{{user `ami-type`}}/playbooks/aminator-amazon-linux.yaml",
         "role_paths": [
-            "ami-images/{{user `ami-type`}}/roles/base",
-            "ami-images/{{user `ami-type`}}/roles/aminator"
+            "ami-images/{{user `ami_type`}}/roles/base"
         ],
         "playbook_dir": "ami-images/aminator/playbooks"
     },

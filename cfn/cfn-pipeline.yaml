@@ -19,13 +19,13 @@ Metadata:
           - Topic
       -
         Label:
-          default: "ArtifactStore"
+          default: "Artifact Store"
         Parameters:
           - SourceRepositoryS3
           - ArtifactStoreS3
       -
         Label:
-          default: "BuilderEnv"
+          default: "Builder Environment"
         Parameters:
           - BuilderVPC
           - BuilderPublicSubnet
@@ -37,7 +37,7 @@ Metadata:
       BuilderPublicSubnet:
         default: "Which Public Subnet should I use?"
       CodeBuildEnv:
-        default: "Should I use a different Docker Image?"
+        default: "Should I use a different Docker Image for CodeBuild?"
       ApprovalEmail:
         default: "Who should I notify upon completion?"
 
@@ -498,7 +498,7 @@ Resources:
                 Provider: Manual
               Configuration:
                 NotificationArn: !Ref AMIBuilderApprovalTopic
-                CustomData: New AMI has been built!! Approve once AMI build has been completed.
+                CustomData: NEW AMI CREATED!! Approve once AMI build has been completed.
               RunOrder: 2
 Outputs:
   resbucketurl:
