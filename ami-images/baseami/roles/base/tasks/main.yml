@@ -1,9 +1,8 @@
 ---
 
-tasks:
-- import_tasks: 'basic-hardening.yml'
-- import_tasks: 'editors-pkg.yml'
-- import_tasks: 'network-pkg.yml'
-- import_tasks: 'repo-setup.yml'
-- import_tasks: 'security-pkg.yml'
-- import_tasks: 'system-pkg.yml'
+- include: 'basic-hardening.yml'
+- include: 'editors-pkg.yml'
+- include: 'network-pkg.yml'
+- include: 'repo-setup.yml'
+- include: 'security-pkg.yml'
+- include: 'system-pkg.yml'
