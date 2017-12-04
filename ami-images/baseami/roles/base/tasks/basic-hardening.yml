@@ -46,7 +46,7 @@
     - games
 
 
-- name: 'Secure root's home directory'
+- name: 'Secure root home directory'
   file:
     dest: '/root'
     state: 'directory'
