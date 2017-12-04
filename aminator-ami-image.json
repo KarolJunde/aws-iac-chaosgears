@@ -43,7 +43,7 @@
     },
     {
         "type": "ansible-local",
-        "playbook_file": "ami-images/{{user `ami_type`}}/playbooks/aminator-amazon-linux.yaml",
+        "playbook_file": "ami-images/{{user `ami_type`}}/playbooks/base-amazon-linux.yml",
         "role_paths": [
             "ami-images/{{user `ami_type`}}/roles/base"
         ],

@@ -1,6 +1,6 @@
 ---
 
-- name: 'Aminator on Ubuntu'
+- name: 'Base AMI on Ubuntu'
   user: 'ubuntu'
   vars_files:
     - ../vars/{{ ansible_distribution }}.yml
