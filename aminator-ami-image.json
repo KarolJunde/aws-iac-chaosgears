@@ -26,10 +26,10 @@
         "source_ami_filter": {
             "filters": {
                 "virtualization-type": "hvm",
-                "name": "amzn-ami-hvm*",
+                "name": "amzn-ami-hvm*x86_64-gp2",
                 "root-device-type": "ebs"
             },
-            "owners": ["505861742066"],
+            "owners": "amazon",
             "most_recent": true
         }
     }],
