@@ -21,7 +21,7 @@
           "Region": "{{user `aws_region`}}",
           "Env": "{{user `environemt`}}",
           "CreationTime": "{{isotime \"02-Jan-2006\"}}",
-          "Retention": "{{user `retention_days`}}",
+          "Retention": "{{user `retention_days`}}"
         },
           "run_volume_tags": {
             "Name": "{{user `aws_ami_prefix`}}"
