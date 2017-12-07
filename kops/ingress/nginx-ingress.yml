@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "nginx-ingress"
+spec:
+  rules:
+  - host: "spinnaker.k8s.nubeschaser.com"
+    http:
+      paths:
+      - path: /spinnaker-9000
+        backend:
+          serviceName: "chaosgears-deck"
+          servicePort: 9000
+      - path: /spinnaker-gui
+        backend:
+          serviceName: "chaosgears-deck"
+          servicePort: 80

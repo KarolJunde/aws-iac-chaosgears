@@ -1,11 +1,47 @@
 ---
 
-- name: 'Base AMI on Amazon Linux'
+- name: 'Base playbook - AMI on Amazon Linux'
+  hosts: 'all'
   user: 'ec2-user'
   vars_files:
-    - ../vars/{{ ansible_distribution }}.yml
+    - ../vars/amazon.yml
 
-  hosts: 'all'
   roles:
     - role: 'base'
       tags: 'base'
+
+- name: 'v2.0.0 of the CIS Amazon Linux 2016.09 Benchmark'
+
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: yes           # majority of CIS tasks require root
+  vars:
+    # CIS Controls whitepaper:  http://bit.ly/2mGAmUc
+    # AWS CIS Whitepaper:       http://bit.ly/2m2Ovrh
+    cis_level_1_exclusions:
+    # 3.4.2 and 3.4.3 effectively blocks access to all ports to the machine
+    ## This can break automation; ignoring it as there are stronger mechanisms than that
+      - 3.4.2
+      - 3.4.3
+    # Cloudwatch Logs will be used instead of Rsyslog/Syslog-ng
+    ## Same would be true if any other software that doesn't support Rsyslog/Syslog-ng mechanisms
+      - 4.2.1.4
+      - 4.2.2.4
+      - 4.2.2.5
+    # Autofs is no longer installed and we need to ignore it or else will fail
+      - 1.1.19
+    # Cloudwatch Logs Role configuration
+    logs:
+      - file: /var/log/messages
+        group_name: "system_logs"
+
+  roles:
+    - role: 'common'
+      tags: 'common'
+
+    - role: 'anthcourtney.cis-amazon-linux'
+      tags: 'anthcourtney.cis-amazon-linux'
+
+    - role: 'dharrisio.aws-cloudwatch-logs-agent'
+      tags: 'dharrisio.aws-cloudwatch-logs-agent'

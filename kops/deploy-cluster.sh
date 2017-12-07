@@ -25,6 +25,7 @@ kops create cluster \
    --network-cidr=10.50.0.0/16 \
    --dns-zone $KOPS_NAME \
    --associate-public-ip=false \
+   --networking=weave \
    --bastion \
    --yes
 
@@ -82,11 +83,11 @@ ACTION1_DEFAULT="CREATE"
 read -p "DEFAULT: [$ACTION1_DEFAULT] -> CHOOSE: [CREATE]|[RUN]||[EDIT]|[DELETE]|[GUI] - K8S CLUSTER ON AWS: " ACTION1
 ACTION1="${ACTION1:-$ACTION1_DEFAULT}"
 
-ACTION2_DEFAULT=""
+ACTION2_DEFAULT="k8s.nubeschaser.com"
 read -p "DEFAULT: [$ACTION2_DEFAULT] -> WHICH KOPS NAME: " ACTION2
 ACTION2="${ACTION2:-$ACTION2_DEFAULT}"
 
-ACTION3_DEFAULT=""
+ACTION3_DEFAULT="s3://kopsawsdemo"
 read -p "DEFAULT: [$ACTION3_DEFAULT] -> WHICH KOPS_STATE_s3: " ACTION3
 ACTION3="${ACTION3:-$ACTION3_DEFAULT}"
 

@@ -1,6 +1,3 @@
-# Define which registries and repositories you want available in your
-# Spinnaker pipeline definitions
-# For more info visit:
 #   http://www.spinnaker.io/v1.0/docs/target-deployment-configuration#section-docker-registry
 
 # Configure your Docker registries here
@@ -12,7 +9,8 @@ accounts:
     - library/ubuntu
     - library/centos
     - library/nginx
-    - wardviaene/spinnaker-node-demo
+    - karolj/chaosgears
+
 # - name: gcr
 #   address: https://gcr.io
 #   username: _json_key
@@ -43,15 +41,18 @@ images:
 
 # Change this if youd like to expose Spinnaker outside the cluster
 deck:
-  host: localhost
+  host: spinnaker.k8s.nubeschaser.com
   port: 9000
   protocol: http
+  annotations:
+       kubernetes.io/ingress.class: nginx
 
 gate:
-  allowedOriginsPattern: '^https?://(?:localhost|127.0.0.1|[^/]+\.example\.com)(?::[1-9]\d*)?/?$'
+ # allowedOriginsPattern: '^https?://(?:localhost|127.0.0.1|[^/]+\.example\.com)(?::[1-9]\d*)?/?$'
+   allowedOriginsPattern: '^https?://(?:spinnaker\.k8s\.nubeschaser\.com|localhost(?::[1-9]\d*)?/?$'
 
 # Bucket to use when storing config data in S3 compatible storage
-storageBucket: demo-spinnaker
+storageBucket: aws-spinnaker-chaosgears
 
 # Change service type for UI service
 serviceType: ClusterIP
@@ -97,7 +98,7 @@ jenkins:
     ServiceType: ClusterIP
     CustomConfigMap: true
     InstallPlugins:
-      - kubernetes:0.11 
+      - kubernetes:0.11
       - workflow-aggregator:2.5
       - workflow-job:2.11
       - credentials-binding:1.12
