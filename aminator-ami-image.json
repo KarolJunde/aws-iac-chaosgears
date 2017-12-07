@@ -4,24 +4,30 @@
         "aws_ami_prefix": "amzn-ami-chaosgears",
         "aws_ami_arch": "linux",
         "aws_ami_name": "baseami",
-        "ami_type": "baseami",
         "retention_days": "30",
         "team_name": "ChaosGears",
         "environemt": "Development"
     },
 
     "builders": [{
+        "name": "AWS AMI Builder - CIS",
         "type": "amazon-ebs",
         "region": "{{user `aws_region`}}",
         "instance_type": "t2.micro",
         "ssh_username": "ec2-user",
         "ami_name": "{{user `aws_ami_prefix`}}-{{user `aws_ami_arch`}}-{{user `aws_ami_name`}}",
         "tags": {
+          "Name": "{{user `aws_ami_name`}}",
           "Region": "{{user `aws_region`}}",
           "Env": "{{user `environemt`}}",
-          "Name": "{{user `ami_type`}}",
           "CreationTime": "{{isotime \"02-Jan-2006\"}}",
-          "Retention": "{{user `retention_days`}}"
+          "Retention": "{{user `retention_days`}}",
+        },
+          "run_volume_tags": {
+            "Name": "{{user `aws_ami_prefix`}}"
+        },
+          "snapshot_tags": {
+            "Name": "{{user `aws_ami_prefix`}}"
         },
         "source_ami_filter": {
             "filters": {
@@ -43,11 +49,12 @@
     },
     {
         "type": "ansible-local",
-        "playbook_file": "ami-images/{{user `ami_type`}}/playbooks/base-amazon-linux.yml",
+        "playbook_file": "ami-images/{{user `aws_ami_name`}}/playbooks/base-amazon-linux.yml",
         "role_paths": [
-            "ami-images/{{user `ami_type`}}/roles/base"
+            "ami-images/{{user `aws_ami_name`}}/roles/base"
         ],
-        "playbook_dir": "ami-images/{{user `ami_type`}}/playbooks"
+        "playbook_dir": "ami-images/{{user `aws_ami_name`}}/playbooks",
+        "galaxy_file": "ami-images/{{user `aws_ami_name`}}/playbooks/requirements.yml"
     },
 
     {
