@@ -98,10 +98,3 @@
     regexp: '^manage_etc_hosts\: True'
     insertafter: '^preserve_hostname'
   tags: cloud-init
-
-
-- name: 'Ensure syslog is started at booting process'
-  systemd:
-    name: 'rsyslog'
-    enabled: yes
-

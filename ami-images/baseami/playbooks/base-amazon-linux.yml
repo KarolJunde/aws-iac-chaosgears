@@ -4,7 +4,7 @@
   hosts: 'all'
   user: 'ec2-user'
   vars_files:
-    - ami-images/baseami/vars/amazon.yml
+    - /vars/amazon.yml
 
   roles:
     - role: 'base'
